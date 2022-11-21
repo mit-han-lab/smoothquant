@@ -30,7 +30,7 @@ In `examples/smoothquant_opt_demo.ipynb`, we use OPT-13B as an example to demons
 
 ## Open Source Roadmap
 
-The following table shows the open source roadmap of SmoothQuant. We will gradually release the code in two weeks. Stay tuned!
+The following table shows the open-source roadmap of SmoothQuant. We will gradually release the code in two weeks. Stay tuned!
 
 - [x] Code for SmoothQuant transformation
 - [x] Activation scales of OPT and BLOOM models
@@ -41,19 +41,19 @@ The following table shows the open source roadmap of SmoothQuant. We will gradua
 
 ## Results
 
-- SmoothQuant migrate **part of** the quantization difficulties from activation to weights, which smooths out the systematic outliers in activation, making both weights and activations **easy to quantize**. 
+- SmoothQuant migrates **part of** the quantization difficulties from activation to weights, which smooths out the systematic outliers in activation, making both weights and activations **easy to quantize**. 
 
 ![migrate](figures/migrate.jpg)
 
-- SmoothQuant can achieve W8A8 quantization of LLMs (e.g., OPT-175B) without degrading accuracy.
+- SmoothQuant can achieve W8A8 quantization of LLMs (e.g., OPT-175B) **without degrading performance**.
 
 ![accuracy](figures/accuracy.png)
 
-- SmoothQuant can achieve faster inference compared to FP16 when integrated to PyTorch, while previous work LLM.int8() does not lead to acceleration (usually slower).
+- SmoothQuant can achieve **faster inference** compared to FP16 when integrated into PyTorch, while previous work LLM.int8() does not lead to acceleration (usually slower).
 
 ![torch_latency_mem](figures/torch_latency_mem.png)
 
-- We also integrate SmoothQuant to state-of-the-art serving framework [FasterTransformer](https://github.com/NVIDIA/FasterTransformer), achieving faster inference speed using only half the GPU numbers compared to FP16 (1 instead of 2 for OPT-66B, 4 instead of 8 for OPT-175B).
+- We also integrate SmoothQuant into the state-of-the-art serving framework [FasterTransformer](https://github.com/NVIDIA/FasterTransformer), achieving **faster** inference speed using only **half the GPU numbers** compared to FP16 (1 instead of 2 for OPT-66B, 4 instead of 8 for OPT-175B).
 
 ![ft_latency_mem](figures/ft_latency_mem.png)
 
