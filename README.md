@@ -25,3 +25,15 @@ python setup.py install
 ## Example
 
 In `examples/smoothquant_opt_demo.ipynb`, we use OPT-13B as an example to demonstrate SmoothQuant can match the accuracy of FP16 and INT8 inference. In the current repo, we simulate INT8 inference with FP16 (`smoothquant/fake_quant.py`), i.e., fake quantization. We have implemented the real 8-bit quantization with INT8 CUTLASS GEMM kernels for both PyTorch and FasterTransformer. Please stay tuned for the release.
+
+
+## Open Source Roadmap
+
+The following table shows the open source roadmap of SmoothQuant. We will gradually release the code in two weeks. Stay tuned!
+
+- [x] SmoothQuant core code
+- [x] Activation scales of OPT and BLOOM models
+- [x] Demo for OPT-13B
+- [ ] SmoothQuant real-INT8 inference for PyTorch
+- [ ] SmoothQuant real-INT8 inference for FasterTransformer
+- [ ] Integration with [lm-evaluation-harness](https://github.com/EleutherAI/lm-evaluation-harness) to reproduce the results in the paper.
