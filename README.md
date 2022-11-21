@@ -1,6 +1,4 @@
-# SmoothQuant: Accurate and Efficient Post-Training Quantization for Large Language Models 
-
-### [[paper](https://arxiv.org/abs/2211.10438)]
+# SmoothQuant: Accurate and Efficient Post-Training Quantization for Large Language Models [[paper](https://arxiv.org/abs/2211.10438)]
 
 **We plan to gradually release the code in ~2 weeks. Stay tuned!**
 
@@ -40,6 +38,24 @@ The following table shows the open source roadmap of SmoothQuant. We will gradua
 - [ ] SmoothQuant real-INT8 inference for PyTorch
 - [ ] SmoothQuant real-INT8 inference for FasterTransformer
 - [ ] Integration with [lm-evaluation-harness](https://github.com/EleutherAI/lm-evaluation-harness) to reproduce the results in the paper.
+
+## Results
+
+- SmoothQuant migrate **part of** the quantization difficulties from activation to weights, which smooths out the systematic outliers in activation, making both weights and activations **easy to quantize**. 
+
+![migrate](figures/migrate.jpg)
+
+- SmoothQuant can achieve W8A8 quantization of LLMs (e.g., OPT-175B) without degrading accuracy.
+
+![accuracy](figures/accuracy.png)
+
+- SmoothQuant can achieve faster inference compared to FP16 when integrated to PyTorch, while previous work LLM.int8() does not lead to acceleration (usually slower).
+
+![torch_latency_mem](figures/torch_latency_mem.png)
+
+- We also integrate SmoothQuant to state-of-the-art serving framework [FasterTransformer](https://github.com/NVIDIA/FasterTransformer), achieving faster inference speed using only half the GPU numbers compared to FP16 (1 instead of 2 for OPT-66B, 4 instead of 8 for OPT-175B).
+
+![ft_latency_mem](figures/ft_latency_mem.png)
 
 ## Citation
 
