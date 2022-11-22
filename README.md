@@ -31,14 +31,14 @@ In `examples/smoothquant_opt_demo.ipynb`, we use OPT-13B as an example to demons
 
 ### Activation Channel Scales and Calibration
 
-We provide the activation channel scales for OPT and BLOOM models. We get those scales with 512 random sentences in the Pile validation set. You can use `examples/smoothquant_opt_demo.ipynb` to test smoothing and quantizing those models.
+We provide the activation channel scales for OPT and BLOOM models in `act_scales/`. We get those scales with 512 random sentences in the Pile validation set. You can use `examples/smoothquant_opt_demo.ipynb` to test smoothing and quantizing those models.
 
 We also provide the script to get the activation channel scales for your own models. Please refer to `smoothquant/calibrate.py`. You can use the following command to get the scales for your own models:
 
 ```bash
 python smoothquant/calibrate.py \
     --model-name <model_name_or_path> \
-    --output-path <output_act_scales_file> \
+    --output-path <output_act_scales_file_path> \
     --num-samples <num_samples> \
     --seq-len <sequence_length> \
     --data-path <path_to_the_calibration_data>
