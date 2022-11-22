@@ -23,10 +23,26 @@ pip install huggingface accelerate datasets
 python setup.py install
 ```
 
-## Example
+## Usage
+
+### Demo on OPT-13B
 
 In `examples/smoothquant_opt_demo.ipynb`, we use OPT-13B as an example to demonstrate SmoothQuant can match the accuracy of FP16 and INT8 inference. In the current repo, we simulate INT8 inference with FP16 (`smoothquant/fake_quant.py`), i.e., fake quantization. We have implemented the real 8-bit quantization with INT8 CUTLASS GEMM kernels for both PyTorch and FasterTransformer. Please stay tuned for the release.
 
+### Activation Channel Scales and Calibration
+
+We provide the activation channel scales for OPT and BLOOM models. We get those scales with 512 random sentences in the Pile validation set. You can use `examples/smoothquant_opt_demo.ipynb` to test smoothing and quantizing those models.
+
+We also provide the script to get the activation channel scales for your own models. Please refer to `smoothquant/calibrate.py`. You can use the following command to get the scales for your own models:
+
+```bash
+python smoothquant/calibrate.py \
+    --model-name <model_name_or_path> \
+    --output-path <output_act_scales_file> \
+    --num-samples <num_samples> \
+    --seq-len <sequence_length> \
+    --data-path <path_to_the_calibration_data>
+```
 
 ## Open Source Roadmap
 

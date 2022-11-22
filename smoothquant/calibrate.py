@@ -52,7 +52,7 @@ def calibrate(model, tokenizer, dataset_path, n_samples, seq_len):
     if not os.path.exists(dataset_path):
         print(f'Cannot find the dataset at {dataset_path}')
         print('Please download the Pile dataset and put the validation set at the path')
-        print('You can download the validation dataset of the Pile at at https://mystic.the-eye.eu/public/AI/pile/val.jsonl.zst')
+        print('You can download the validation dataset of the Pile at https://mystic.the-eye.eu/public/AI/pile/val.jsonl.zst')
         raise FileNotFoundError
 
     dataset = load_dataset("json", data_files=dataset_path, split="train")
@@ -71,15 +71,14 @@ def calibrate(model, tokenizer, dataset_path, n_samples, seq_len):
 
 def parse_args():
     parser = argparse.ArgumentParser()
-    parser.add_argument('--output-path', type=str,
-                        help='where to save the meta data')
     parser.add_argument('--model-name', type=str,
                         default='facebook/opt-1.3b', help='model name')
+    parser.add_argument('--output-path', type=str,
+                        help='where to save the meta data')
     parser.add_argument('--data-path', type=str, default='../dataset/val.jsonl.zst',
                         help='location of the calibration dataset, we use the validation set of the Pile dataset')
-    parser.add_argument('--n-samples', type=int, default=512)
+    parser.add_argument('--num-samples', type=int, default=512)
     parser.add_argument('--seq-len', type=int, default=512)
-
     args = parser.parse_args()
     return args
 
