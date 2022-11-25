@@ -89,9 +89,9 @@ def main():
     model, tokenizer = build_model_and_tokenizer(args.model_name)
 
     act_scales = calibrate(model, tokenizer, args.data_path,
-                           args.n_samples, args.seq_len)
+                           args.num_samples, args.seq_len)
 
-    os.makedirs(os.path.dirname(args.output_path), exist_ok=True)
+    os.makedirs(os.path.dirname(os.path.abspath(args.output_path)), exist_ok=True)
     torch.save(act_scales, args.output_path)
 
 
