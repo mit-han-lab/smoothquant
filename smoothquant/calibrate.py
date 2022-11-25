@@ -16,8 +16,8 @@ import functools
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
 
-def build_model_and_tokenizer(model_name):
-    tokenizer = AutoTokenizer.from_pretrained(model_name, model_max_length=512)
+def build_model_and_tokenizer(model_name, tokenizer):
+    tokenizer = AutoTokenizer.from_pretrained(tokenizer, model_max_length=512)
     kwargs = {"torch_dtype": torch.float16, "device_map": "auto"}
     model = AutoModelForCausalLM.from_pretrained(model_name, **kwargs)
     return model, tokenizer
@@ -40,6 +40,7 @@ def calibrate(model, tokenizer, dataset_path, n_samples, seq_len):
         if isinstance(x, tuple):
             x = x[0]
         stat_tensor(name, x)
+        stat_tensor(name + ".after", y)
 
     hooks = []
     for name, m in model.named_modules():
@@ -79,6 +80,8 @@ def parse_args():
                         help='location of the calibration dataset, we use the validation set of the Pile dataset')
     parser.add_argument('--num-samples', type=int, default=512)
     parser.add_argument('--seq-len', type=int, default=512)
+    parser.add_argument('--tokenizer', type=str, default=None,
+                        help='name of the tokenizer to use. By default, use the same as model-name')
     args = parser.parse_args()
     return args
 
@@ -86,12 +89,13 @@ def parse_args():
 @torch.no_grad()
 def main():
     args = parse_args()
-    model, tokenizer = build_model_and_tokenizer(args.model_name)
+    tokenizer = args.tokenizer if args.tokenizer is not None else args.model_name
+    model, tokenizer = build_model_and_tokenizer(args.model_name, tokenizer)
 
     act_scales = calibrate(model, tokenizer, args.data_path,
-                           args.n_samples, args.seq_len)
+                           args.num_samples, args.seq_len)
 
-    os.makedirs(os.path.dirname(args.output_path), exist_ok=True)
+    os.makedirs(os.path.dirname(os.path.abspath(args.output_path)), exist_ok=True)
     torch.save(act_scales, args.output_path)
 
 
