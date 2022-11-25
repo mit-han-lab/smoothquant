@@ -40,6 +40,7 @@ def calibrate(model, tokenizer, dataset_path, n_samples, seq_len):
         if isinstance(x, tuple):
             x = x[0]
         stat_tensor(name, x)
+        stat_tensor(name + ".after", y)
 
     hooks = []
     for name, m in model.named_modules():
