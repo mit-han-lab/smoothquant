@@ -17,8 +17,8 @@ Large language models (LLMs) show excellent performance but are compute- and mem
 ```bash
 conda create -n smoothquant python=3.8
 conda activate smoothquant
-pip install torch torchvision torchaudio --extra-index-url https://download.pytorch.org/whl/cu113
-pip install huggingface accelerate datasets
+pip install torch==1.12.1+cu113 torchvision==0.13.1+cu113 torchaudio==0.12.1 --extra-index-url https://download.pytorch.org/whl/cu113
+pip install transformers accelerate datasets
 
 python setup.py install
 ```
@@ -33,15 +33,15 @@ In `examples/smoothquant_opt_demo.ipynb`, we use OPT-13B as an example to demons
 
 We provide the activation channel scales for OPT and BLOOM models in `act_scales/`. We get those scales with 512 random sentences in the Pile validation set. You can use `examples/smoothquant_opt_demo.ipynb` to test smoothing and quantizing those models.
 
-We also provide the script to get the activation channel scales for your own models. Please refer to `smoothquant/calibrate.py`. You can use the following command to get the scales for your own models:
+We also provide the script to get the activation channel scales for your own models. Please refer to `examples/generate_act_scales.py`. You can use the following command to get the scales for your own models:
 
 ```bash
-python smoothquant/calibrate.py \
+python examples/generate_act_scales.py \
     --model-name <model_name_or_path> \
     --output-path <output_act_scales_file_path> \
     --num-samples <num_samples> \
     --seq-len <sequence_length> \
-    --data-path <path_to_the_calibration_data>
+    --dataset-path <path_to_the_calibration_dataset>
 ```
 
 ## Open Source Roadmap

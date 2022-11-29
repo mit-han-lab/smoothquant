@@ -1,5 +1,6 @@
 dataset/
-
+scripts/
+int8_models/
 .DS_Store
 
 # Byte-compiled / optimized / DLL files
