@@ -1,5 +1,6 @@
 import torch
 import argparse
+import os
 
 from transformers.models.opt.modeling_opt import OPTForCausalLM
 from transformers import AutoTokenizer
@@ -27,6 +28,13 @@ if __name__ == '__main__':
     act_scales = torch.load(args.act_scales)
     smooth_lm(model, act_scales, 0.5)
     tokenizer = AutoTokenizer.from_pretrained(args.model_name)
+
+    if not os.path.exists(args.dataset_path):
+        print(f'Cannot find the dataset at {args.dataset_path}')
+        print('Please download the Pile dataset and put the validation set at the path')
+        print('You can download the validation dataset of the Pile at https://mystic.the-eye.eu/public/AI/pile/val.jsonl.zst')
+        raise FileNotFoundError
+
     decoder_layer_scales = get_static_decoder_layer_scales(model,
                                                            tokenizer,
                                                            args.dataset_path,
