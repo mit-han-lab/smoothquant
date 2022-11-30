@@ -25,11 +25,11 @@ python setup.py install
 
 ## Usage
 
-### Demo on OPT-30B with W8A8 Real Quantization
+### SmoothQuant Real-INT8 Inference for PyTorch
 
-### Demo on OPT-13B with W8A8 Fake Quantization
+We provide a PyTorch implementation of SmoothQuant real-INT8 inference with [CUTLASS](https://github.com/NVIDIA/cutlass) INT8 GEMM kernels, which are wrapped as PyTorch modules in [torch-int](https://github.com/Guangxuan-Xiao/torch-int).
 
-In `examples/smoothquant_opt_demo.ipynb`, we use OPT-13B as an example to demonstrate SmoothQuant can match the accuracy of FP16 and INT8 inference. In the current repo, we simulate INT8 inference with FP16 (`smoothquant/fake_quant.py`), i.e., fake quantization.
+In `example/smoothquant_opt_real_int8_demo.ipynb`, we show 
 
 ### Activation Channel Scales and Calibration
 
@@ -46,6 +46,9 @@ python examples/generate_act_scales.py \
     --dataset-path <path_to_the_calibration_dataset>
 ```
 
+### Demo on OPT-13B with W8A8 Fake Quantization
+
+In `examples/smoothquant_opt_demo.ipynb`, we use OPT-13B as an example to demonstrate SmoothQuant can match the accuracy of FP16 and INT8 inference, while the naive baseline cannot. We simulate INT8 inference with FP16 (`smoothquant/fake_quant.py`), i.e., fake quantization.
 
 ## Open Source Roadmap
 
