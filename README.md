@@ -17,32 +17,47 @@ Large language models (LLMs) show excellent performance but are compute- and mem
 ```bash
 conda create -n smoothquant python=3.8
 conda activate smoothquant
-pip install torch torchvision torchaudio --extra-index-url https://download.pytorch.org/whl/cu113
-pip install huggingface accelerate datasets
+pip install torch==1.12.1+cu113 torchvision==0.13.1+cu113 torchaudio==0.12.1 --extra-index-url https://download.pytorch.org/whl/cu113
+pip install transformers accelerate datasets
 
 python setup.py install
 ```
 
 ## Usage
 
-### Demo on OPT-13B
+### SmoothQuant INT8 Inference for PyTorch
 
-In `examples/smoothquant_opt_demo.ipynb`, we use OPT-13B as an example to demonstrate SmoothQuant can match the accuracy of FP16 and INT8 inference. In the current repo, we simulate INT8 inference with FP16 (`smoothquant/fake_quant.py`), i.e., fake quantization. We have implemented the real 8-bit quantization with INT8 CUTLASS GEMM kernels for both PyTorch and FasterTransformer. Please stay tuned for the release.
+We implement SmoothQuant INT8 inference for PyTorch with [CUTLASS](https://github.com/NVIDIA/cutlass) INT8 GEMM kernels, which are wrapped as PyTorch modules in [torch-int](https://github.com/Guangxuan-Xiao/torch-int). Please install [torch-int](https://github.com/Guangxuan-Xiao/torch-int) before running the SmoothQuant PyTorch INT8 inference.
+
+We implement the quantized OPT model class in [smoothquant/opt.py](smoothquant/opt.py), which uses INT8 linear layers and bundles quantization scales. We provide the already smoothed and quantized OPT model at [https://huggingface.co/mit-han-lab/opt-[MODEL-SIZE]-smoothquant](https://huggingface.co/mit-han-lab/opt-[MODEL-SIZE]-smoothquant), where `[MODEL-SIZE]` can be `125m`, `1.3B`, `2.7B`, `6.7B`, `13B`, `30b`, and `66b`. You can load the INT8 model with the following code:
+
+```python
+from smoothquant.opt import Int8OPTForCausalLM
+model = Int8OPTForCausalLM.from_pretrained("mit-han-lab/opt-30b-smoothquant")
+```
+
+You can also check [generate_act_scales.py](examples/generate_act_scales.py) and [export_int8_model.py](examples/export_int8_model.py) to see how we smooth, quantize and export INT8 models.
+
+In [example/smoothquant_opt_real_int8_demo.ipynb](example/smoothquant_opt_real_int8_demo.ipynb), we use OPT-30B model to demonstrate the latency and memory advantages of SmoothQuant. We demonstrate on OPT-30B because it is the largest model we can run both the FP16 and INT8 inference on a single A100 GPU. For larger models requiring multiple GPUs, we recommend using the [FasterTransformer](https://github.com/NVIDIA/FasterTransformer) implementation of SmoothQuant.
 
 ### Activation Channel Scales and Calibration
 
-We provide the activation channel scales for OPT and BLOOM models in `act_scales/`. We get those scales with 512 random sentences in the Pile validation set. You can use `examples/smoothquant_opt_demo.ipynb` to test smoothing and quantizing those models.
+We provide the activation channel scales for OPT and BLOOM models in [act_scales/](act_scales/). We get those scales with 512 random sentences in the Pile validation set. You can use [examples/smoothquant_opt_demo.ipynb](examples/smoothquant_opt_demo.ipynb) to test smoothing and quantizing those models.
 
-We also provide the script to get the activation channel scales for your own models. Please refer to `smoothquant/calibrate.py`. You can use the following command to get the scales for your own models:
+We also provide the script to get the activation channel scales for your models. Please refer to [examples/generate_act_scales.py](examples/generate_act_scales.py). You can use the following command to get the scales for your models:
 
 ```bash
-python smoothquant/calibrate.py \
+python examples/generate_act_scales.py \
     --model-name <model_name_or_path> \
     --output-path <output_act_scales_file_path> \
     --num-samples <num_samples> \
     --seq-len <sequence_length> \
-    --data-path <path_to_the_calibration_data>
+    --dataset-path <path_to_the_calibration_dataset>
 ```
+
+### Demo on OPT-13B with W8A8 Fake Quantization
+
+In [examples/smoothquant_opt_demo.ipynb](examples/smoothquant_opt_demo.ipynb), we use OPT-13B as an example to demonstrate SmoothQuant can match the accuracy of FP16 and INT8 inference, while the naive baseline cannot. We simulate INT8 inference with FP16 ([smoothquant/fake_quant.py](smoothquant/fake_quant.py)), i.e., fake quantization.
 
 ## Open Source Roadmap
 
@@ -52,7 +67,7 @@ The following table shows the open-source roadmap of SmoothQuant. We will gradua
 - [x] Activation scales of OPT and BLOOM models
 - [x] Demo for OPT-13B
 - [x] Code for SmoothQuant smoothing factor calibration
-- [ ] SmoothQuant real-INT8 inference for PyTorch
+- [x] SmoothQuant real-INT8 inference for PyTorch
 - [ ] SmoothQuant real-INT8 inference for FasterTransformer
 - [ ] Integration with [lm-evaluation-harness](https://github.com/EleutherAI/lm-evaluation-harness) to reproduce the results in the paper.
 
