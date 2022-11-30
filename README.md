@@ -57,7 +57,7 @@ python examples/generate_act_scales.py \
 
 ### Demo on OPT-13B with W8A8 Fake Quantization
 
-In `examples/smoothquant_opt_demo.ipynb`, we use OPT-13B as an example to demonstrate SmoothQuant can match the accuracy of FP16 and INT8 inference, while the naive baseline cannot. We simulate INT8 inference with FP16 (`smoothquant/fake_quant.py`), i.e., fake quantization.
+In [examples/smoothquant_opt_demo.ipynb](examples/smoothquant_opt_demo.ipynb), we use OPT-13B as an example to demonstrate SmoothQuant can match the accuracy of FP16 and INT8 inference, while the naive baseline cannot. We simulate INT8 inference with FP16 ([smoothquant/fake_quant.py](smoothquant/fake_quant.py)), i.e., fake quantization.
 
 ## Open Source Roadmap
 
