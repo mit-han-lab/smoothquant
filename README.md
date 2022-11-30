@@ -1,9 +1,6 @@
 # SmoothQuant: Accurate and Efficient Post-Training Quantization for Large Language Models [[paper](https://arxiv.org/abs/2211.10438)]
 
-**We plan to gradually release the code in ~2 weeks. Stay tuned!**
-
 **If you are interested in getting updates, please sign up [here](https://forms.gle/YjYQQas5Hbqge1LH9) to get notified!**
-
 
 ![intuition](figures/intuition.png)
 
