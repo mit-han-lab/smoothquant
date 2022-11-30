@@ -42,7 +42,7 @@ In [example/smoothquant_opt_real_int8_demo.ipynb](example/smoothquant_opt_real_i
 
 ### Activation Channel Scales and Calibration
 
-We provide the activation channel scales for OPT and BLOOM models in `act_scales/`. We get those scales with 512 random sentences in the Pile validation set. You can use [examples/smoothquant_opt_demo.ipynb](examples/smoothquant_opt_demo.ipynb) to test smoothing and quantizing those models.
+We provide the activation channel scales for OPT and BLOOM models in [act_scales/](act_scales/). We get those scales with 512 random sentences in the Pile validation set. You can use [examples/smoothquant_opt_demo.ipynb](examples/smoothquant_opt_demo.ipynb) to test smoothing and quantizing those models.
 
 We also provide the script to get the activation channel scales for your models. Please refer to [examples/generate_act_scales.py](examples/generate_act_scales.py). You can use the following command to get the scales for your models:
 
