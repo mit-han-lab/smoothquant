@@ -27,15 +27,24 @@ python setup.py install
 
 ### SmoothQuant Real-INT8 Inference for PyTorch
 
-We provide a PyTorch implementation of SmoothQuant real-INT8 inference with [CUTLASS](https://github.com/NVIDIA/cutlass) INT8 GEMM kernels, which are wrapped as PyTorch modules in [torch-int](https://github.com/Guangxuan-Xiao/torch-int).
+We implement SmoothQuant real-INT8 inference for PyTorch with [CUTLASS](https://github.com/NVIDIA/cutlass) INT8 GEMM kernels, which are wrapped as PyTorch modules in [torch-int](https://github.com/Guangxuan-Xiao/torch-int). Please install [torch-int](https://github.com/Guangxuan-Xiao/torch-int) before running the SmoothQuant real-INT8 inference.
 
-In `example/smoothquant_opt_real_int8_demo.ipynb`, we show 
+We implement the quantized OPT model class in [smoothquant/opt.py](../smoothquant/opt.py), which uses INT8 linear layers and bundles quantization scales. We provide the already smoothed and quantized OPT model at `https://huggingface.co/mit-han-lab/opt-[MODEL-SIZE]-smoothquant`, where `[MODEL-SIZE]` can be `125m`, `1.3B`, `2.7B`, `6.7B`, `13B`, `30b`, and `66b`. You can load the INT8 model with the following code:
+
+```python
+from smoothquant.opt import Int8OPTForCausalLM
+model = Int8OPTForCausalLM.from_pretrained("mit-han-lab/opt-30b-smoothquant")
+```
+
+You can also check [generate_act_scales.py](../examples/generate_act_scales.py) and [export_int8_model.py](../examples/export_int8_model.py) to see how we smooth, quantize and export INT8 models.
+
+In `example/smoothquant_opt_real_int8_demo.ipynb`, we use OPT-30B model to demonstrate the latency and memory advantages of SmoothQuant. We demonstrate on OPT-30B because it is the largest model we can run both the FP16 and INT8 inference on a single A100 GPU. For larger models requiring multiple GPUs, we recommend using the [FasterTransformer](https://github.com/NVIDIA/FasterTransformer) implementation of SmoothQuant.
 
 ### Activation Channel Scales and Calibration
 
-We provide the activation channel scales for OPT and BLOOM models in `act_scales/`. We get those scales with 512 random sentences in the Pile validation set. You can use `examples/smoothquant_opt_demo.ipynb` to test smoothing and quantizing those models.
+We provide the activation channel scales for OPT and BLOOM models in `act_scales/`. We get those scales with 512 random sentences in the Pile validation set. You can use [examples/smoothquant_opt_demo.ipynb](examples/smoothquant_opt_demo.ipynb) to test smoothing and quantizing those models.
 
-We also provide the script to get the activation channel scales for your own models. Please refer to `examples/generate_act_scales.py`. You can use the following command to get the scales for your own models:
+We also provide the script to get the activation channel scales for your models. Please refer to [examples/generate_act_scales.py](examples/generate_act_scales.py). You can use the following command to get the scales for your models:
 
 ```bash
 python examples/generate_act_scales.py \
