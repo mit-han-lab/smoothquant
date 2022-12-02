@@ -65,7 +65,7 @@ The following table shows the open-source roadmap of SmoothQuant. We will gradua
 - [x] Demo for OPT-13B
 - [x] Code for SmoothQuant smoothing factor calibration
 - [x] SmoothQuant real-INT8 inference for PyTorch
-- [ ] SmoothQuant real-INT8 inference for FasterTransformer
+- [x] SmoothQuant real-INT8 inference for FasterTransformer
 - [ ] Integration with [lm-evaluation-harness](https://github.com/EleutherAI/lm-evaluation-harness) to reproduce the results in the paper.
 
 ## Results
