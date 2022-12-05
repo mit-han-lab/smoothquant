@@ -1,18 +1,13 @@
-import os
-
 import torch
 import torch.nn as nn
 
 from datasets import load_dataset
 import functools
-import os
 from collections import defaultdict
 
 from functools import partial
 import numpy as np
 from tqdm import tqdm
-from datasets import load_dataset
-
 
 
 def get_act_scales(model, tokenizer, dataset_path, num_samples=512, seq_len=512):
