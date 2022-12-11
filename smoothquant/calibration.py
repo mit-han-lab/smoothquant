@@ -1,18 +1,13 @@
-import os
-
 import torch
 import torch.nn as nn
 
 from datasets import load_dataset
 import functools
-import os
 from collections import defaultdict
 
 from functools import partial
 import numpy as np
 from tqdm import tqdm
-from datasets import load_dataset
-
 
 
 def get_act_scales(model, tokenizer, dataset_path, num_samples=512, seq_len=512):
@@ -65,7 +60,7 @@ def get_static_decoder_layer_scales(model,
                                     ):
     model.eval()
     device = next(model.parameters()).device
-    
+
     act_dict = defaultdict(dict)
 
     def stat_io_hook(m, x, y, name):
@@ -96,7 +91,7 @@ def get_static_decoder_layer_scales(model,
     dataset = dataset.shuffle(seed=42)
     for i in pbar:
         input_ids = tokenizer(dataset[i]["text"], return_tensors="pt",
-                                max_length=seq_len, truncation=True).input_ids.to(device)
+                              max_length=seq_len, truncation=True).input_ids.to(device)
         model(input_ids)
         mean_scale = np.mean([v["input"] for v in act_dict.values()])
         pbar.set_description(f"Mean input scale: {mean_scale:.2f}")
