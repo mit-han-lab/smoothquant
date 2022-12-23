@@ -1,4 +1,4 @@
-# SmoothQuant: Accurate and Efficient Post-Training Quantization for Large Language Models [[paper](https://arxiv.org/abs/2211.10438)]
+# SmoothQuant: Accurate and Efficient Post-Training Quantization for Large Language Models [[paper](https://arxiv.org/abs/2211.10438)] [[slides](assets/SmoothQuant.pdf)]
 
 **If you are interested in getting updates, please sign up [here](https://forms.gle/YjYQQas5Hbqge1LH9) to get notified!**
 
