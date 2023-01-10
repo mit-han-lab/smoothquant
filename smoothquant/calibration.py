@@ -57,6 +57,7 @@ def get_static_decoder_layer_scales(model,
                                     dataset_path,
                                     num_samples=512,
                                     seq_len=512,
+                                    return_all=False,
                                     ):
     model.eval()
     device = next(model.parameters()).device
@@ -97,6 +98,9 @@ def get_static_decoder_layer_scales(model,
         pbar.set_description(f"Mean input scale: {mean_scale:.2f}")
     for hook in hooks:
         hook.remove()
+
+    if return_all:
+        return act_dict
 
     decoder_layer_scales = []
     for idx in range(model.config.num_hidden_layers):
