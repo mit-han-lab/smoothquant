@@ -2,6 +2,8 @@ import torch
 import argparse
 import os
 
+from pathlib import Path
+
 from transformers.models.opt.modeling_opt import OPTForCausalLM
 from transformers import AutoTokenizer
 
@@ -18,10 +20,10 @@ if __name__ == '__main__':
     parser.add_argument("--seq-len", type=int, default=512)
     parser.add_argument("--act-scales", type=str,
                         default='act_scales/opt-13b.pt')
-    parser.add_argument("--output-path", type=str,
-                        default='int8_models/opt-13b-smoothquant')
+    parser.add_argument("--output-path", type=str, default='int8_models')
     parser.add_argument('--dataset-path', type=str, default='dataset/val.jsonl.zst',
                         help='location of the calibration dataset, we use the validation set of the Pile dataset')
+    parser.add_argument('--scales-only', default=False, action="store_true")
     args = parser.parse_args()
     model = OPTForCausalLM.from_pretrained(
         args.model_name, device_map="sequential", torch_dtype=torch.float16)
@@ -39,6 +41,14 @@ if __name__ == '__main__':
                                                            tokenizer,
                                                            args.dataset_path,
                                                            num_samples=args.num_samples,
-                                                           seq_len=args.seq_len)
-    int8_model = Int8OPTForCausalLM.from_float(model, decoder_layer_scales)
-    int8_model.save_pretrained(args.output_path)
+                                                           seq_len=args.seq_len,
+                                                           return_all=args.scales_only)
+    if args.scales_only:
+        output_path = Path(args.output_path) / (args.model_name.split('/')[-1] + "-smoothquant-scales.pt")
+        torch.save(decoder_layer_scales, output_path)
+        print(f"Saved scaling factors at {output_path}")
+    else:
+        output_path = Path(args.output_path) / (args.model_name.split('/')[-1] + "-smoothquant.pt")
+        int8_model = Int8OPTForCausalLM.from_float(model, decoder_layer_scales)
+        int8_model.save_pretrained(output_path)
+        print(f"Saved int8 model at {output_path}")
