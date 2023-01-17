@@ -57,11 +57,11 @@ def get_static_decoder_layer_scales(model,
                                     dataset_path,
                                     num_samples=512,
                                     seq_len=512,
-                                    return_all=False,
+                                    return_act_scales_dict=False,
                                     ):
     model.eval()
     device = next(model.parameters()).device
-    
+
     act_dict = defaultdict(dict)
 
     def stat_io_hook(m, x, y, name):
@@ -92,14 +92,14 @@ def get_static_decoder_layer_scales(model,
     dataset = dataset.shuffle(seed=42)
     for i in pbar:
         input_ids = tokenizer(dataset[i]["text"], return_tensors="pt",
-                                max_length=seq_len, truncation=True).input_ids.to(device)
+                              max_length=seq_len, truncation=True).input_ids.to(device)
         model(input_ids)
         mean_scale = np.mean([v["input"] for v in act_dict.values()])
         pbar.set_description(f"Mean input scale: {mean_scale:.2f}")
     for hook in hooks:
         hook.remove()
 
-    if return_all:
+    if return_act_scales_dict:
         return act_dict
 
     decoder_layer_scales = []
