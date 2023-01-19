@@ -57,7 +57,6 @@ def get_static_decoder_layer_scales(model,
                                     dataset_path,
                                     num_samples=512,
                                     seq_len=512,
-                                    return_act_scales_dict=False,
                                     ):
     model.eval()
     device = next(model.parameters()).device
@@ -99,9 +98,6 @@ def get_static_decoder_layer_scales(model,
     for hook in hooks:
         hook.remove()
 
-    if return_act_scales_dict:
-        return act_dict
-
     decoder_layer_scales = []
     for idx in range(model.config.num_hidden_layers):
         scale_dict = {}
@@ -121,4 +117,4 @@ def get_static_decoder_layer_scales(model,
             f"model.decoder.layers.{idx}.fc2"]["input"] / 127
         decoder_layer_scales.append(scale_dict)
 
-    return decoder_layer_scales
+    return decoder_layer_scales, act_dict
