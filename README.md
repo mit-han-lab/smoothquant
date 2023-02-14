@@ -6,8 +6,16 @@
 
 ## Abstract
 
-Large language models (LLMs) show excellent performance but are compute- and memory-intensive. Quantization can reduce memory and accelerate inference. However, for LLMs beyond 100 billion parameters, existing methods cannot maintain accuracy or have to rely on techniques that do not run efficiently on hardware. We propose SmoothQuant, a training-free, lightweight, and general-purpose post-training quantization (PTQ) solution to enable lossless 8-bit weight, 8-bit activation (W8A8) quantization for LLMs that can be implemented efficiently. We observe that systematic outliers appear at fixed activation channels. Based on the fact that weights are easy to quantize while activations are not, SmoothQuant smooths the activation outliers by migrating the quantization difficulty from activations to weights with a mathematically equivalent transformation. SmoothQuant enables an INT8 quantization of both weights and activations for all the GEMMs in LLMs, including OPT-175B, BLOOM-176B, and GLM-130B. SmoothQuant has better hardware efficiency than existing techniques using mixed-precision activation quantization or weight-only quantization. We demonstrate up to 1.56x speedup and 2x memory reduction for LLMs with negligible loss in accuracy. Thanks to the hardware-friendly design, we integrate SmoothQuant into FasterTransformer, a state-of-the-art LLM serving framework, and achieve faster inference speed with half the number of GPUs compared to FP16. Our work offers a turn-key solution that reduces hardware costs and democratizes LLMs.
-
+Large language models (LLMs) show excellent performance but are compute- and memory-intensive.
+Quantization can reduce memory and accelerate inference.
+However, for LLMs beyond 100 billion parameters, existing methods cannot maintain accuracy or do not run efficiently on hardware.
+We propose SmoothQuant, a training-free, accuracy-preserving, and general-purpose post-training quantization (PTQ) solution to enable 8-bit weight, 8-bit activation (W8A8) quantization for LLMs.
+Based on the fact that weights are easy to quantize while activations are not, SmoothQuant smooths the activation outliers by offline migrating the quantization difficulty from activations to weights with a mathematically equivalent transformation.
+SmoothQuant enables an INT8 quantization of both weights and activations for all the matrix multiplications in LLMs, including OPT-175B, BLOOM-176B, GLM-130B, and MT-NLG 530B. SmoothQuant
+has better hardware efficiency than existing techniques.
+We demonstrate up to 1.56x speedup and 2x memory reduction for LLMs with negligible loss in accuracy.
+We integrate SmoothQuant into FasterTransformer, a state-of-the-art LLM serving framework,
+and achieve faster inference speed with half the number of GPUs compared to FP16, enabling the serving of a 530B LLM within a single node. Our work offers a turn-key solution that reduces hardware costs and democratizes LLMs.
 
 ## Installation
 
@@ -55,18 +63,6 @@ python examples/generate_act_scales.py \
 ### Demo on OPT-13B with W8A8 Fake Quantization
 
 In [examples/smoothquant_opt_demo.ipynb](examples/smoothquant_opt_demo.ipynb), we use OPT-13B as an example to demonstrate SmoothQuant can match the accuracy of FP16 and INT8 inference, while the naive baseline cannot. We simulate INT8 inference with FP16 ([smoothquant/fake_quant.py](smoothquant/fake_quant.py)), i.e., fake quantization.
-
-## Open Source Roadmap
-
-The following table shows the open-source roadmap of SmoothQuant. We will gradually release the code in two weeks. Stay tuned!
-
-- [x] Code for SmoothQuant transformation
-- [x] Activation scales of OPT and BLOOM models
-- [x] Demo for OPT-13B
-- [x] Code for SmoothQuant smoothing factor calibration
-- [x] SmoothQuant real-INT8 inference for PyTorch
-- [x] SmoothQuant real-INT8 inference for FasterTransformer
-- [ ] Integration with [lm-evaluation-harness](https://github.com/EleutherAI/lm-evaluation-harness) to reproduce the results in the paper.
 
 ## Results
 
