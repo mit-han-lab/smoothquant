@@ -89,7 +89,7 @@ If you find SmoothQuant useful or relevant to your research, please kindly cite 
 ```bibtex
 @article{xiao2022smoothquant,
   title={SmoothQuant: Accurate and Efficient Post-Training Quantization for Large Language Models},
-  author={Xiao, Guangxuan and Lin, Ji and Seznec, Mickael and Demouth, Julien and Han, Song},
+  author={Xiao, Guangxuan and Lin, Ji and Seznec, Mickael and Wu, Hao and Demouth, Julien and Han, Song},
   journal={arXiv},
   year={2022}
 }
