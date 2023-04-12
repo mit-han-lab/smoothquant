@@ -26,7 +26,7 @@ if __name__ == '__main__':
     parser.add_argument('--export-FT', default=False, action="store_true")
     args = parser.parse_args()
     model = OPTForCausalLM.from_pretrained(
-        args.model_name, device_map="sequential", torch_dtype=torch.float16)
+        args.model_name, device_map="auto", torch_dtype=torch.float16)
     act_scales = torch.load(args.act_scales)
     smooth_lm(model, act_scales, 0.5)
     tokenizer = AutoTokenizer.from_pretrained(args.model_name)
