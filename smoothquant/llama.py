@@ -16,8 +16,8 @@ from transformers.models.llama.modeling_llama import (
 from transformers.models.llama.configuration_llama import LlamaConfig
 from transformers.activations import SiLUActivation
 from typing import Optional, Tuple, List
-# down, out: W8A8BFP32OFP32Linear, q, k, v: W8A8BFP32OFP32Linear, gate: W8A8BFP32OFP32Linear, up: W8A8B8O8Linear
-from torch_int.nn.linear import W8A8B8O8LinearWithSFactor, W8A8BFP32OFP32LinearWithSFactor
+# must use branch llama-dev in https://github.com/AniZpZ/torch-int
+from torch_int.nn.linear import W8A8BFP32OFP32LinearWithSFactor
 from smoothquant.fake_quant import W8A8Linear
 from transformers.utils import logging
 logger = logging.get_logger(__name__)
@@ -62,10 +62,7 @@ class Int8LlamaAttention(nn.Module):
                    out_input_scale: float):
         int8_module = Int8LlamaAttention(config)
         
-        print("turning attention into w8a8liner")
-        logger.info("turning attention into w8a8liner")
         # Fuse the scaling into the q_proj output scale
-        
         # we do not impelement attn for now bacuase we want use paged attention
         int8_module.q_proj = W8A8BFP32OFP32LinearWithSFactor.from_float(
             module.q_proj, attn_input_scale)
@@ -241,9 +238,7 @@ class Int8LlamaDecoderLayer(nn.Module):
         int8_module = Int8LlamaDecoderLayer(
             config
         )
-        print("turn each layer mlp and attention to int8")
-        logger.info("turn each layer mlp and attention to int8")
-        #FIXME: use int8 rmsnorm, torch_int LayerNormQ  can be a reference
+
         int8_module.self_attn = Int8LlamaAttention.from_float(
             module.self_attn, 
             config,
@@ -350,9 +345,9 @@ class Int8LlamaForCausalLM(LlamaPreTrainedModel):
     
     @staticmethod
     def from_float(module, decoder_layer_scales):
-        print("create int8 model")
+        # print("create int8 model")
         int8_module = Int8LlamaForCausalLM(module.config)
-        print("start turn into int8")
+        # print("start turn into int8")
         int8_module.model = Int8LlamaModel.from_float(
             module.model, decoder_layer_scales)
         int8_module.lm_head = module.lm_head
