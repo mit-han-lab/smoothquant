@@ -64,14 +64,22 @@ class Int8LlamaAttention(nn.Module):
                    out_input_scale: float):
         int8_module = Int8LlamaAttention(config)
         
-        # Fuse the scaling into the q_proj output scale
         # we do not impelement attn for now bacuase we want use paged attention
-        int8_module.q_proj = W8A8BFP32OFP32Linear.from_float(
-            module.q_proj, attn_input_scale)
-        int8_module.k_proj = W8A8BFP32OFP32Linear.from_float(
-            module.k_proj, attn_input_scale)
-        int8_module.v_proj = W8A8BFP32OFP32Linear.from_float(
-            module.v_proj, attn_input_scale)
+        
+        # FIXME: Fuse the scaling into the q_proj output scale
+        linearList = [module.q_proj, module.k_proj, module.v_proj]
+ 
+        qkv_list = W8A8BFP32OFP32Linear.from_float_fuse(
+            linearList,
+            attn_input_scale)
+        if len(qkv_list) != 3:
+            raise ValueError(
+                f"invalid qkv list len, must return 3 linears but get {len(qkv_list)}")
+
+        int8_module.q_proj = qkv_list[0]
+        int8_module.k_proj = qkv_list[1]
+        int8_module.v_proj = qkv_list[2]
+
         int8_module.o_proj = W8A8BFP32OFP32LinearWithSFactor.from_float(
             module.o_proj, out_input_scale)
         return int8_module
@@ -205,10 +213,23 @@ class Int8LlamaMLP(nn.Module):
                    down_input_scale: float,
                    down_output_scale: float):
         int8Mlp = Int8LlamaMLP(config)
-        # TODO: kernel fusion 
-        int8Mlp.gate_proj = W8A8BFP32OFP32Linear.from_float(module.gate_proj, gate_input_scale)
-        int8Mlp.up_proj = W8A8BFP32OFP32Linear.from_float(module.up_proj, up_input_scale)
-        int8Mlp.down_proj = W8A8BFP32OFP32LinearWithSFactor.from_float(module.down_proj, down_input_scale)
+
+        # FIXME: Fuse the scaling into the q_proj output scale
+        print(f"gate in {gate_input_scale}, up in {up_input_scale}")
+        linearList = [module.gate_proj, module.up_proj]
+        gateup_list = W8A8BFP32OFP32Linear.from_float_fuse(
+            linearList, 
+            gate_input_scale)
+
+        if len(gateup_list) != 2:
+            raise ValueError(
+                f"invalid qkv gateup len, must return 2 linears but get {len(qkv_list)}")
+
+        int8Mlp.gate_proj = gateup_list[0]
+        int8Mlp.up_proj = gateup_list[1]
+        int8Mlp.down_proj = W8A8BFP32OFP32LinearWithSFactor.from_float(
+            module.down_proj, 
+            down_input_scale)
 
         return int8Mlp
         
