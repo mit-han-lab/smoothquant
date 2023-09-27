@@ -215,7 +215,6 @@ class Int8LlamaMLP(nn.Module):
         int8Mlp = Int8LlamaMLP(config)
 
         # FIXME: Fuse the scaling into the q_proj output scale
-        print(f"gate in {gate_input_scale}, up in {up_input_scale}")
         linearList = [module.gate_proj, module.up_proj]
         gateup_list = W8A8BFP32OFP32Linear.from_float_fuse(
             linearList, 
