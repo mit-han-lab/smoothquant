@@ -1,10 +1,10 @@
 # SmoothQuant: Accurate and Efficient Post-Training Quantization for Large Language Models [[paper](https://arxiv.org/abs/2211.10438)] [[slides](assets/SmoothQuant.pdf)]
 
+![intuition](figures/intuition.png)
+
 ## News
 
 - [2023/10] SmoothQuant is integrated into NVIDIA [TensorRT-LLM](https://github.com/NVIDIA/TensorRT-LLM/)
-
-![intuition](figures/intuition.png)
 
 ## Abstract
 
