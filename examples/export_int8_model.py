@@ -8,7 +8,7 @@ from transformers.models.opt.modeling_opt import OPTForCausalLM
 from transformers import AutoTokenizer
 
 from smoothquant.opt import Int8OPTForCausalLM
-from smoothquant.smooth import smooth_lm
+from smoothquant.smooth import smooth_lm, auto_smooth_lm
 
 from smoothquant.calibration import get_static_decoder_layer_scales
 
@@ -24,11 +24,11 @@ if __name__ == '__main__':
     parser.add_argument('--dataset-path', type=str, default='dataset/val.jsonl.zst',
                         help='location of the calibration dataset, we use the validation set of the Pile dataset')
     parser.add_argument('--export-FT', default=False, action="store_true")
+    parser.add_argument("--no-auto-smooth", default=False, action="store_true")
     args = parser.parse_args()
     model = OPTForCausalLM.from_pretrained(
         args.model_name, device_map="auto", torch_dtype=torch.float16)
     act_scales = torch.load(args.act_scales)
-    smooth_lm(model, act_scales, 0.5)
     tokenizer = AutoTokenizer.from_pretrained(args.model_name)
 
     if not os.path.exists(args.dataset_path):
@@ -36,6 +36,11 @@ if __name__ == '__main__':
         print('Please download the Pile dataset and put the validation set at the path')
         print('You can download the validation dataset of the Pile at https://mystic.the-eye.eu/public/AI/pile/val.jsonl.zst')
         raise FileNotFoundError
+
+    if args.no_auto_smooth:
+        smooth_lm(model, act_scales, 0.5)
+    else:
+        auto_smooth_lm(model, tokenizer, act_scales, args.dataset_path)
 
     decoder_layer_scales, raw_scales = get_static_decoder_layer_scales(model,
                                                                        tokenizer,
