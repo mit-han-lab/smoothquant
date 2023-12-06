@@ -1,8 +1,8 @@
 import torch
 import torch.nn as nn
 
-from transformers.models.opt.modeling_opt import OPTDecoderLayer
-from transformers.models.bloom.modeling_bloom import BloomBlock
+from transformers.models.opt.modeling_opt import OPTDecoderLayer, OPTForCausalLM
+from transformers.models.bloom.modeling_bloom import BloomBlock, BloomForCausalLM
 from datasets import load_dataset
 import functools
 from tqdm import tqdm
@@ -74,7 +74,7 @@ def get_smooth_layer_keys(model):
 
 
 @torch.no_grad()
-def auto_smooth_lm(model, tokenizer, act_maxes, dataset_path, num_samples=10, seq_len=512, act_quant="per_token", weight_quant="per_channel"):
+def auto_smooth_lm(model, tokenizer, act_maxes, dataset_path, num_samples=10, seq_len=512, act_quant="per_token", weight_quant="per_channel", w_bits=8, act_bits=8):
     model.eval()
     device = next(model.parameters()).device
 
@@ -110,16 +110,16 @@ def auto_smooth_lm(model, tokenizer, act_maxes, dataset_path, num_samples=10, se
             ws = m.weight * scales.view(1, -1)
 
             if act_quant == "per_token":
-                xfq = quantize_activation_per_token_absmax(xs)
+                xfq = quantize_activation_per_token_absmax(xs, act_bits)
             elif act_quant == "per_tensor":
-                xfq = quantize_activation_per_tensor_absmax(xs)
+                xfq = quantize_activation_per_tensor_absmax(xs, act_bits)
             else:
                 raise ValueError("do not support act quant method: " + act_quant)
             
             if weight_quant == "per_channel":
-                wfq = quantize_weight_per_channel_absmax(ws)
+                wfq = quantize_weight_per_channel_absmax(ws, w_bits)
             elif weight_quant == "per_tensor":
-                wfq = quantize_weight_per_tensor_absmax(ws)
+                wfq = quantize_weight_per_tensor_absmax(ws, w_bits)
             else:
                 raise ValueError("do not support weight quant method: " + weight_quant)
 
@@ -162,3 +162,120 @@ def auto_smooth_lm(model, tokenizer, act_maxes, dataset_path, num_samples=10, se
 
     smooth_lm(model, act_maxes, layer_alphas)
 
+
+def _get_module_name(model, layer):
+    for name, module in model.named_modules():
+        if layer is module:
+            return name
+    return None
+
+
+def get_model_blocks(model):
+    if isinstance(model, OPTForCausalLM):
+        layers = model.model.decoder.layers
+    elif isinstance(model, BloomForCausalLM):
+        layers = model.transformer.h
+    else:
+        raise NotImplementedError(type(model))
+    return layers
+
+
+@torch.no_grad()
+def auto_clip_lm(model, tokenizer, dataset_path, num_samples=10, seq_len=512, act_quant="per_token", weight_quant="per_channel", w_bits=8, act_bits=8, min_scale_factor=0.5, steps=20):
+    model.eval()
+    device = next(model.parameters()).device
+
+    dataset = load_dataset("json", data_files=dataset_path, split="train")
+    dataset = dataset.shuffle(seed=42)
+
+    layer_clips = {}
+    layer_scale_factor = {}
+
+    # adapted from llm-awq
+    def search_clip_hook(m, x, y, name):
+        ori_y = y
+        device = m.weight.device
+        dtype = m.weight.dtype
+
+        org_max_val = m.weight.abs().amax(dim=-1, keepdim=True)
+
+        if isinstance(y, tuple):
+            ori_y = y[0]
+        if isinstance(x, tuple):
+            x = x[0]
+        
+        best_clip_val = None
+        best_scale_factor = -1
+        best_loss = float('inf')
+        loss_history = []
+
+        for s in range(0, steps+1):
+            alpha = s / steps
+            scale_factor = min_scale_factor + (1 - min_scale_factor) * alpha
+            max_val = org_max_val * scale_factor
+            min_val = -max_val
+            ws = torch.clamp(m.weight, min_val, max_val)
+
+            if act_quant == "per_token":
+                xfq = quantize_activation_per_token_absmax(x, act_bits)
+            elif act_quant == "per_tensor":
+                xfq = quantize_activation_per_tensor_absmax(x, act_bits)
+            else:
+                raise ValueError("do not support act quant method: " + act_quant)
+            
+            if weight_quant == "per_channel":
+                wfq = quantize_weight_per_channel_absmax(ws, w_bits)
+            elif weight_quant == "per_tensor":
+                wfq = quantize_weight_per_tensor_absmax(ws, w_bits)
+            else:
+                raise ValueError("do not support weight quant method: " + weight_quant)
+
+            yfq = torch.matmul(xfq, wfq.t_())
+            if m.bias is not None:
+                yfq = yfq + m.bias
+
+            loss = (ori_y - yfq).float().pow(2).mean().item()
+            loss_history.append(loss)
+            if loss < best_loss:
+                best_loss = loss
+                best_scale_factor = scale_factor
+                best_clip_val = max_val
+
+        # print(name, best_scale_factor, loss_history)
+        if name not in layer_clips.keys():
+            layer_clips[name] = [best_clip_val,]
+            layer_scale_factor[name] = [best_scale_factor]
+        else:
+            layer_clips[name].append(best_clip_val)
+            layer_scale_factor[name].append(best_scale_factor)
+
+    hooks = []
+    layers = get_model_blocks(model)
+    for layer in layers:
+        for name, m in layer.named_modules():
+            if isinstance(m, nn.Linear):
+                ln = _get_module_name(model, m)
+                hooks.append(
+                    m.register_forward_hook(
+                        functools.partial(search_clip_hook, name=ln))
+                )
+
+    for i in tqdm(range(num_samples), "search clip value..."):
+        input_ids = tokenizer(dataset[i]["text"], return_tensors="pt",
+                            max_length=seq_len, truncation=True).input_ids.to(device)
+        model(input_ids)
+
+    for h in hooks:
+        h.remove()
+
+    for k, v in layer_clips.items():
+        vt = torch.concat(v, dim=1)
+        layer_clips[k] = torch.mean(vt, dim=1, keepdim=True)
+    # print(layer_scale_factor)
+
+    for layer in layers:
+        for name, m in layer.named_modules():
+            if isinstance(m, nn.Linear):
+                ln = _get_module_name(model, m)
+                clip_val = layer_clips[ln]
+                m.weight.data = torch.clamp(m.weight.data, -clip_val, clip_val)

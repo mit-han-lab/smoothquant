@@ -8,7 +8,7 @@ from transformers.models.opt.modeling_opt import OPTForCausalLM
 from transformers import AutoTokenizer
 
 from smoothquant.opt import Int8OPTForCausalLM
-from smoothquant.smooth import smooth_lm, auto_smooth_lm
+from smoothquant.smooth import smooth_lm, auto_smooth_lm, auto_clip_lm
 
 from smoothquant.calibration import get_static_decoder_layer_scales
 
@@ -25,6 +25,9 @@ if __name__ == '__main__':
                         help='location of the calibration dataset, we use the validation set of the Pile dataset')
     parser.add_argument('--export-FT', default=False, action="store_true")
     parser.add_argument("--no-auto-smooth", default=False, action="store_true")
+    parser.add_argument("--no-auto-clip", default=False, action="store_true")
+    parser.add_argument("--w_bits", type=int, default=8, help="weight quant bits, typically 4 or 8")
+    parser.add_argument("--act_bits", type=int, default=8, help="activation quant bits, typically 4 or 8")
     args = parser.parse_args()
     model = OPTForCausalLM.from_pretrained(
         args.model_name, device_map="auto", torch_dtype=torch.float16)
@@ -40,7 +43,10 @@ if __name__ == '__main__':
     if args.no_auto_smooth:
         smooth_lm(model, act_scales, 0.5)
     else:
-        auto_smooth_lm(model, tokenizer, act_scales, args.dataset_path)
+        auto_smooth_lm(model, tokenizer, act_scales, args.dataset_path, w_bits=args.w_bits, act_bits=args.act_bits)
+
+    if not args.no_auto_clip:
+        auto_clip_lm(model, tokenizer, args.dataset_path, w_bits=args.w_bits, act_bits=args.act_bits)
 
     decoder_layer_scales, raw_scales = get_static_decoder_layer_scales(model,
                                                                        tokenizer,
