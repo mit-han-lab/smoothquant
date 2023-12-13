@@ -43,7 +43,7 @@ if __name__ == '__main__':
                                                                             args.dataset_path,
                                                                             num_samples=args.num_samples,
                                                                             seq_len=args.seq_len)
-    output_path = Path(args.output_path) / (Path(args.model_name).name + "-smoothquant")
+    output_path = Path(args.output_path) / ("llama-" + Path(args.model_name).name + "-smoothquant-per-token-opt")
     if args.export_FT:
         model.save_pretrained(output_path)
         print(f"Saved smoothed model at {output_path}")
