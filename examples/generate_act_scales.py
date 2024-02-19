@@ -37,7 +37,7 @@ def main():
     if not os.path.exists(args.dataset_path):
         print(f'Cannot find the dataset at {args.dataset_path}')
         print('Please download the Pile dataset and put the validation set at the path')
-        print('You can download the validation dataset of the Pile at https://mystic.the-eye.eu/public/AI/pile/val.jsonl.zst')
+        print('You can download the validation dataset of the Pile at https://huggingface.co/datasets/mit-han-lab/pile-val-backup/resolve/main/val.jsonl.zst')
         raise FileNotFoundError
 
     act_scales = get_act_scales(model, tokenizer, args.dataset_path,
