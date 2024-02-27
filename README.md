@@ -51,7 +51,7 @@ In [examples/smoothquant_opt_real_int8_demo.ipynb](examples/smoothquant_opt_real
 
 ### Activation Channel Scales and Calibration
 
-We provide the activation channel scales for OPT and BLOOM models in [act_scales/](act_scales/). We get those scales with 512 random sentences in the Pile validation set. You can use [examples/smoothquant_opt_demo.ipynb](examples/smoothquant_opt_demo.ipynb) to test smoothing and quantizing those models.
+We provide the activation channel scales for Llama, Mistral, Mixtral, Falcon, OPT, and BLOOM models in [act_scales/](act_scales/). We get those scales with 512 random sentences in the Pile validation set. You can use the OPT demo ([examples/smoothquant_opt_demo.ipynb](examples/smoothquant_opt_demo.ipynb)) and Llama demo ([examples/smoothquant_llama_demo.ipynb](examples/smoothquant_llama_demo.ipynb)) to test smoothing and quantizing those models.
 
 We also provide the script to get the activation channel scales for your models. Please refer to [examples/generate_act_scales.py](examples/generate_act_scales.py). You can use the following command to get the scales for your models:
 
@@ -67,6 +67,38 @@ python examples/generate_act_scales.py \
 ### Demo on OPT-13B with W8A8 Fake Quantization
 
 In [examples/smoothquant_opt_demo.ipynb](examples/smoothquant_opt_demo.ipynb), we use OPT-13B as an example to demonstrate SmoothQuant can match the accuracy of FP16 and INT8 inference, while the naive baseline cannot. We simulate INT8 inference with FP16 ([smoothquant/fake_quant.py](smoothquant/fake_quant.py)), i.e., fake quantization.
+
+### Perplexity Results on Llama-1/2, Falcon, Mistral, and Mixtral with W8A8 Fake Quantization
+
+We provide an evaluation script to evaluate the language modeling perplexity of OPT, BLoom, Llama, Falcon, Mistral, and Mixtral models with W8A8 fake quantization. Please refer to [smoothquant/ppl_eval.py](smoothquant/ppl_eval.py). You can use the following command to evaluate the models:
+
+```bash
+python smoothquant/ppl_eval.py \
+    --model_path <model_name_or_path> \
+    --act_scales_path <act_scales_file_path> \
+    --smooth \
+    --quantize
+```
+
+Results:
+
+| Model         | Method  | PPL   | Alpha |
+|---------------|---------|-------|-------|
+| Llama-2-7B    | FP16    | 5.823 |       |
+|               | SQ W8A8 | 5.856 | 0.85  |
+| Llama-2-13B   | FP16    | 5.182 |       |
+|               | SQ W8A8 | 5.221 | 0.85  |
+| Llama-2-70B   | FP16    | 3.520 |       |
+|               | SQ W8A8 | 3.567 | 0.9   |
+| Mistral-7B    | FP16    | 5.503 |       |
+|               | SQ W8A8 | 5.530 | 0.8   |
+| Mixtral-8x7B  | FP16    | 4.250 |       |
+|               | SQ W8A8 | 4.285 | 0.8   |
+| Falcon-7B     | FP16    | 6.947 |       |
+|               | SQ W8A8 | 6.983 | 0.6   |
+| Falcon-40B    | FP16    | 5.495 |       |
+|               | SQ W8A8 | 5.523 | 0.7   |
+
 
 ## Results
 
