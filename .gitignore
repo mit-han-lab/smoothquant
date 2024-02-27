@@ -3,6 +3,8 @@ scripts/
 int8_models/
 .DS_Store
 
+*.pt
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
