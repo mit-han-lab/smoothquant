@@ -1,6 +1,8 @@
 dataset/
 scripts/
 int8_models/
+logs/
+*.pt
 .DS_Store
 
 *.pt
