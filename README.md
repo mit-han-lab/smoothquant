@@ -100,7 +100,7 @@ Results:
 | Falcon-40B   | FP16                                | 5.495 |       |
 |              | [SQ W8A8](examples/ppl_eval.sh#L49) | 5.523 | 0.7   |
 
-For W8A8 real quantization deployment, we recommend using the NVIDIA [TensorRT-LLM](https://github.com/NVIDIA/TensorRT-LLM/blob/main/docs/source/precision.md#int8-smoothquant-w8a8) implementation of SmoothQuant.
+For measured speedup, we recommend using the NVIDIA [TensorRT-LLM](https://github.com/NVIDIA/TensorRT-LLM/blob/main/docs/source/precision.md#int8-smoothquant-w8a8) implementation of SmoothQuant.
 
 ## Results
 
