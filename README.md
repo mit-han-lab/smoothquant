@@ -85,20 +85,20 @@ Results:
 
 | Model        | Method                              | PPL   | Alpha |
 | ------------ | ----------------------------------- | ----- | ----- |
-| Llama-2-7B   | FP16                                | 5.823 |       |
-|              | [SQ W8A8](examples/ppl_eval.sh#L1)  | 5.856 | 0.85  |
-| Llama-2-13B  | FP16                                | 5.182 |       |
-|              | [SQ W8A8](examples/ppl_eval.sh#L9)  | 5.221 | 0.85  |
-| Llama-2-70B  | FP16                                | 3.520 |       |
-|              | [SQ W8A8](examples/ppl_eval.sh#L17) | 3.567 | 0.9   |
-| Mistral-7B   | FP16                                | 5.503 |       |
-|              | [SQ W8A8](examples/ppl_eval.sh#L25) | 5.530 | 0.8   |
-| Mixtral-8x7B | FP16                                | 4.250 |       |
-|              | [SQ W8A8](examples/ppl_eval.sh#L33) | 4.285 | 0.8   |
-| Falcon-7B    | FP16                                | 6.947 |       |
-|              | [SQ W8A8](examples/ppl_eval.sh#L41) | 6.983 | 0.6   |
-| Falcon-40B   | FP16                                | 5.495 |       |
-|              | [SQ W8A8](examples/ppl_eval.sh#L49) | 5.523 | 0.7   |
+| Llama-2-7B   | FP16                                | 5.474 |       |
+|              | [SQ W8A8](examples/ppl_eval.sh#L1)  | 5.515 | 0.85  |
+| Llama-2-13B  | FP16                                | 4.950 |       |
+|              | [SQ W8A8](examples/ppl_eval.sh#L9)  | 4.929 | 0.85  |
+| Llama-2-70B  | FP16                                | 3.320 |       |
+|              | [SQ W8A8](examples/ppl_eval.sh#L17) | 3.359 | 0.9   |
+| Mistral-7B   | FP16                                | 5.253 |       |
+|              | [SQ W8A8](examples/ppl_eval.sh#L25) | 5.277 | 0.8   |
+| Mixtral-8x7B | FP16                                | 3.842 |       |
+|              | [SQ W8A8](examples/ppl_eval.sh#L33) | 3.893 | 0.8   |
+| Falcon-7B    | FP16                                | 6.590 |       |
+|              | [SQ W8A8](examples/ppl_eval.sh#L41) | 6.629 | 0.6   |
+| Falcon-40B   | FP16                                | 5.228 |       |
+|              | [SQ W8A8](examples/ppl_eval.sh#L49) | 5.255 | 0.7   |
 
 For measured speedup, we recommend using the NVIDIA [TensorRT-LLM](https://github.com/NVIDIA/TensorRT-LLM/blob/main/docs/source/precision.md#int8-smoothquant-w8a8) implementation of SmoothQuant.
 

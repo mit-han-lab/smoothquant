@@ -1,8 +1,8 @@
 import torch
 import torch.nn as nn
 from transformers import AutoTokenizer, AutoModelForCausalLM
-from .smooth import smooth_lm
-from .fake_quant import quantize_model
+from smoothquant.smooth import smooth_lm
+from smoothquant.fake_quant import quantize_model
 import tqdm
 
 from datasets import load_dataset
@@ -17,7 +17,7 @@ parser.add_argument(
     type=str,
     default="act_scales/llama-2-7b.pt",
 )
-parser.add_argument("--n_samples", type=int, default=40)
+parser.add_argument("--n_samples", type=int, default=None)
 parser.add_argument("--smooth", action="store_true")
 parser.add_argument("--quantize", action="store_true")
 
@@ -45,7 +45,8 @@ class Evaluator:
     def evaluate(self, model):
         model.eval()
         nlls = []
-        for i in tqdm.tqdm(range(self.n_samples), desc="Evaluating..."):
+        n_samples = self.n_samples if self.n_samples else self.dataset.size(1) // 2048
+        for i in tqdm.tqdm(range(n_samples), desc="Evaluating..."):
             batch = self.dataset[:, (i * 2048) : ((i + 1) * 2048)].to(model.device)
             with torch.no_grad():
                 lm_logits = model(batch).logits
@@ -58,7 +59,7 @@ class Evaluator:
             neg_log_likelihood = loss.float() * 2048
             nlls.append(neg_log_likelihood)
 
-        return torch.exp(torch.stack(nlls).sum() / (self.n_samples * 2048))
+        return torch.exp(torch.stack(nlls).sum() / (n_samples * 2048))
 
 
 tokenizer = AutoTokenizer.from_pretrained(model_path)

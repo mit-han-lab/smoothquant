@@ -2,7 +2,7 @@
 CUDA_VISIBLE_DEVICES=0 python smoothquant/ppl_eval.py \
     --alpha 0.85 \
     --model_path meta-llama/Llama-2-7b-hf \
-    --act_scales_path act_scales/llama-2-7b-hf.pt \
+    --act_scales_path act_scales/llama-2-7b.pt \
     --smooth \
     --quantize
 
@@ -10,7 +10,7 @@ CUDA_VISIBLE_DEVICES=0 python smoothquant/ppl_eval.py \
 CUDA_VISIBLE_DEVICES=0 python smoothquant/ppl_eval.py \
     --alpha 0.85 \
     --model_path meta-llama/Llama-2-13b-hf \
-    --act_scales_path act_scales/llama-2-13b-hf.pt \
+    --act_scales_path act_scales/llama-2-13b.pt \
     --smooth \
     --quantize
 
@@ -18,7 +18,7 @@ CUDA_VISIBLE_DEVICES=0 python smoothquant/ppl_eval.py \
 CUDA_VISIBLE_DEVICES=0,1,2 python smoothquant/ppl_eval.py \
     --alpha 0.9 \
     --model_path meta-llama/Llama-2-70b-hf \
-    --act_scales_path act_scales/llama-2-70b-hf.pt \
+    --act_scales_path act_scales/llama-2-70b.pt \
     --smooth \
     --quantize
 
