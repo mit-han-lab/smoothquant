@@ -53,3 +53,19 @@ CUDA_VISIBLE_DEVICES=0,1 python smoothquant/ppl_eval.py \
     --act_scales_path act_scales/falcon-40b.pt \
     --smooth \
     --quantize
+
+# Meta-Llama-3-8B
+CUDA_VISIBLE_DEVICES=0 python smoothquant/ppl_eval.py \
+    --alpha 0.85 \
+    --model_path meta-llama/Meta-Llama-3-8B \
+    --act_scales_path act_scales/Meta-Llama-3-8B.pt \
+    --smooth \
+    --quantize
+
+# Meta-Llama-3-70B
+CUDA_VISIBLE_DEVICES=0,1 python smoothquant/ppl_eval.py \
+    --alpha 0.85 \
+    --model_path meta-llama/Meta-Llama-3-70B \
+    --act_scales_path act_scales/Meta-Llama-3-70B.pt \
+    --smooth \
+    --quantize

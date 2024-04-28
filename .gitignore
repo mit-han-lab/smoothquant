@@ -3,6 +3,7 @@ scripts/
 int8_models/
 logs/
 *.pt
+slurm_log/
 .DS_Store
 
 *.pt

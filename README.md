@@ -5,7 +5,7 @@
 
 ## News
 
-- [2024/03] We show SmoothQuant can enable W8A8 quantization for Llama-1/2, Falcon, Mistral, and Mixtral models with negligible loss. [Results](https://github.com/mit-han-lab/smoothquant?tab=readme-ov-file#perplexity-results-on-llama-12-falcon-mistral-and-mixtral-with-w8a8-quantization).
+- [2024/03] We show SmoothQuant can enable W8A8 quantization for Llama-1/2/3, Falcon, Mistral, and Mixtral models with negligible loss. [Results](https://github.com/mit-han-lab/smoothquant?tab=readme-ov-file#perplexity-results-on-llama-123-falcon-mistral-and-mixtral-with-w8a8-quantization).
 - [2023/10] SmoothQuant is integrated into NVIDIA [TensorRT-LLM](https://github.com/NVIDIA/TensorRT-LLM/).
 - [2023/03] SmoothQuant is integrated into Intel [Neural-Compressor](https://github.com/intel/neural-compressor).
 
@@ -28,7 +28,7 @@ and achieve faster inference speed with half the number of GPUs compared to FP16
 conda create -n smoothquant python=3.8
 conda activate smoothquant
 pip install torch==1.12.1+cu113 torchvision==0.13.1+cu113 torchaudio==0.12.1 --extra-index-url https://download.pytorch.org/whl/cu113
-pip install transformers accelerate datasets zstandard
+pip install transformers==4.36.0 accelerate datasets zstandard
 
 python setup.py install
 ```
@@ -69,7 +69,7 @@ python examples/generate_act_scales.py \
 
 In [examples/smoothquant_opt_demo.ipynb](examples/smoothquant_opt_demo.ipynb), we use OPT-13B as an example to demonstrate SmoothQuant can match the accuracy of FP16 and INT8 inference, while the naive baseline cannot. We simulate INT8 inference with FP16 ([smoothquant/fake_quant.py](smoothquant/fake_quant.py)), i.e., fake quantization.
 
-### Perplexity Results on Llama-1/2, Falcon, Mistral, and Mixtral with W8A8 Quantization
+### Perplexity Results on Llama-1/2/3, Falcon, Mistral, and Mixtral with W8A8 Quantization
 
 We provide an evaluation script to evaluate the language modeling perplexity of OPT, BLoom, Llama, Falcon, Mistral, and Mixtral models with W8A8 simulated quantization. Please refer to [smoothquant/ppl_eval.py](smoothquant/ppl_eval.py). You can use the following command to evaluate the models:
 
@@ -92,6 +92,10 @@ Results:
 |              | [SQ W8A8](examples/ppl_eval.sh#L9)  | 4.929 | 0.85  |
 | Llama-2-70B  | FP16                                | 3.320 |       |
 |              | [SQ W8A8](examples/ppl_eval.sh#L17) | 3.359 | 0.9   |
+| Llama-3-8B   | FP16                                | 6.138 |       |
+|              | [SQ W8A8](examples/ppl_eval.sh#L58) | 6.258 | 0.85  |
+| Llama-3-70B  | FP16                                | 2.857 |       |
+|              | [SQ W8A8](examples/ppl_eval.sh#L66) | 2.982 | 0.85  |
 | Mistral-7B   | FP16                                | 5.253 |       |
 |              | [SQ W8A8](examples/ppl_eval.sh#L25) | 5.277 | 0.8   |
 | Mixtral-8x7B | FP16                                | 3.842 |       |
