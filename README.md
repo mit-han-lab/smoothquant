@@ -5,6 +5,7 @@
 
 ## News
 
+- [2024/05] SmoothQuant enables INT8 model inference on [AMD Instinct MI300X using Composable Kernel](https://rocm.blogs.amd.com/software-tools-optimization/ck-int8-gemm-sq/README.html).
 - [2024/03] We show SmoothQuant can enable W8A8 quantization for Llama-1/2/3, Falcon, Mistral, and Mixtral models with negligible loss. [Results](https://github.com/mit-han-lab/smoothquant?tab=readme-ov-file#perplexity-results-on-llama-123-falcon-mistral-and-mixtral-with-w8a8-quantization).
 - [2023/11] SmoothQuant is integrated into [Amazon SageMaker](https://aws.amazon.com/blogs/machine-learning/boost-inference-performance-for-llms-with-new-amazon-sagemaker-containers).
 - [2023/10] SmoothQuant is integrated into NVIDIA [TensorRT-LLM](https://github.com/NVIDIA/TensorRT-LLM/).
