@@ -9,7 +9,7 @@ def quantize_weight_per_channel_absmax(w, n_bits=8):
     scales = w.abs().max(dim=-1, keepdim=True)[0]
     q_max = 2 ** (n_bits - 1) - 1
     scales.clamp_(min=1e-5).div_(q_max)
-    w.div_(scales).round_().mul_(scales)
+    w.div_(scales).round_().clamp_(-q_max, q_max).mul_(scales)
     return w
 
 
@@ -19,7 +19,7 @@ def quantize_weight_per_tensor_absmax(w, n_bits=8):
     scales = w.abs().max()
     q_max = 2 ** (n_bits - 1) - 1
     scales.clamp_(min=1e-5).div_(q_max)
-    w.div_(scales).round_().mul_(scales)
+    w.div_(scales).round_().clamp_(-q_max, q_max).mul_(scales)
     return w
 
 
@@ -30,7 +30,7 @@ def quantize_activation_per_token_absmax(t, n_bits=8):
     scales = t.abs().max(dim=-1, keepdim=True)[0]
     q_max = 2 ** (n_bits - 1) - 1
     scales.clamp_(min=1e-5).div_(q_max)
-    t.div_(scales).round_().mul_(scales)
+    t.div_(scales).round_().clamp_(-q_max, q_max).mul_(scales)
     return t
 
 
@@ -41,7 +41,7 @@ def quantize_activation_per_tensor_absmax(t, n_bits=8):
     scales = t.abs().max()
     q_max = 2 ** (n_bits - 1) - 1
     scales.clamp_(min=1e-5).div_(q_max)
-    t.div_(scales).round_().mul_(scales)
+    t.div_(scales).round_().clamp_(-q_max, q_max).mul_(scales)
     return t
 
 
